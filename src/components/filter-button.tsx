@@ -1,11 +1,9 @@
-interface FilterButtonProps {
+import { ButtonHTMLAttributes } from "react";
+
+interface FilterButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   text: string;
 }
 
-export const FilterButton = (props: FilterButtonProps) => {
-  return (
-    <button className={"w-[87px] h-[40px] bg-[#F0F0F0] rounded-full"}>
-      {props.text}
-    </button>
-  );
+export const FilterButton = ({ text, ...attributes }: FilterButtonProps) => {
+  return <button {...attributes}>{text}</button>;
 };
