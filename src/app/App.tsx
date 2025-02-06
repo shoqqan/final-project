@@ -3,35 +3,14 @@ import { Header } from "../components/header.tsx";
 import { Todolist } from "../components/todolist.tsx";
 import { Footer } from "../components/footer.tsx";
 import { useEffect, useState } from "react";
-
-export enum TaskStatus {
-  TODO = "todo",
-  DONE = "done",
-  TRASH = "trash",
-}
-
-export interface Task {
-  id: string;
-  title: string;
-  status: TaskStatus;
-}
+import { useAppSelector } from "../store/hooks.ts";
+import { Task, TaskStatus } from "../store/slices/tasks-slice.ts";
 
 function App() {
-  const [tasks, setTasks] = useState<Task[]>([
-    {
-      id: "1",
-      title: "Buy a milk",
-      status: TaskStatus.TODO,
-    },
-    { id: "2", title: "Learn React", status: TaskStatus.TODO },
-    { id: "3", title: "Learn TypeScript", status: TaskStatus.DONE },
-    { id: "4", title: "Learn Next.js", status: TaskStatus.DONE },
-    { id: "5", title: "Learn TailwindCSS", status: TaskStatus.TRASH },
-  ]);
-  const [filter, setFilter] = useState<TaskStatus>(TaskStatus.TODO);
+  const tasks = useAppSelector((state) => state.tasks.tasks);
+  const filter = useAppSelector((state) => state.tasks.filter);
   const [filteredTasks, setFilteredTasks] = useState<Task[]>(tasks);
   useEffect(() => {
-    console.log(tasks);
     switch (filter) {
       case TaskStatus.TODO: {
         const todoTasks = tasks.filter(
@@ -59,12 +38,8 @@ function App() {
 
   return (
     <div className={"w-screen p-10 bg-white flex flex-col gap-y-10"}>
-      <Header filter={filter} setFilter={setFilter} />
-      <Todolist
-        tasks={tasks}
-        filteredTasks={filteredTasks}
-        setTasks={setTasks}
-      />
+      <Header />
+      <Todolist filteredTasks={filteredTasks} />
       <Footer />
     </div>
   );

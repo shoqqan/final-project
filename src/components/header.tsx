@@ -1,16 +1,24 @@
 import { FilterButton } from "./filter-button.tsx";
-import { TaskStatus } from "../app/App.tsx";
 import clsx from "clsx";
 import { createPortal } from "react-dom";
+import { useAppDispatch, useAppSelector } from "../store/hooks.ts";
+import {
+  addNewTask,
+  changeFilter,
+  TaskStatus,
+} from "../store/slices/tasks-slice.ts";
+import { useState } from "react";
 
-interface HeaderProps {
-  filter: TaskStatus;
-  setFilter: (filter: TaskStatus) => void;
-}
+export const Header = () => {
+  const filter = useAppSelector((state) => state.tasks.filter);
+  const dispatch = useAppDispatch();
+  const onChangeFilter = (filter: TaskStatus) => {
+    dispatch(changeFilter(filter));
+  };
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-export const Header = ({ filter, setFilter }: HeaderProps) => {
   return (
-    <header className={"w-full flex flex-col gap-y-30"}>
+    <header className={"w-full flex flex-col gap-y-30 relative"}>
       <div className={"flex flex-col gap-y-2"}>
         <h1 className={"font-bold text-3xl"}>Simple Todolist</h1>
         <p className={"text-base"}>
@@ -26,9 +34,7 @@ export const Header = ({ filter, setFilter }: HeaderProps) => {
               filter === TaskStatus.TODO &&
                 "bg-purple-500 text-white text-bold",
             )}
-            onClick={() => {
-              setFilter(TaskStatus.TODO);
-            }}
+            onClick={() => onChangeFilter(TaskStatus.TODO)}
           />
           <FilterButton
             text={"Done"}
@@ -37,9 +43,7 @@ export const Header = ({ filter, setFilter }: HeaderProps) => {
               filter === TaskStatus.DONE &&
                 "bg-purple-500  text-white text-bold",
             )}
-            onClick={() => {
-              setFilter(TaskStatus.DONE);
-            }}
+            onClick={() => onChangeFilter(TaskStatus.DONE)}
           />
           <FilterButton
             text={"Trash"}
@@ -48,18 +52,39 @@ export const Header = ({ filter, setFilter }: HeaderProps) => {
               filter === TaskStatus.TRASH &&
                 "bg-purple-500 text-white text-bold",
             )}
-            onClick={() => setFilter(TaskStatus.TRASH)}
+            onClick={() => onChangeFilter(TaskStatus.TRASH)}
           />
         </div>
         <button
           className={
-            "w-[52px] h-[52px] bg-[#081E34] flex justify-center items-center rounded-full"
+            "modal w-[52px] h-[52px] bg-[#081E34] flex justify-center items-center rounded-full"
           }
-          onClick={() => {}}
+          onClick={() => {
+            setIsDialogOpen(true);
+          }}
         >
           <img src="/plus.svg" alt="Add Todo" />
-          {createPortal(<div>modal</div>, document.body)};
         </button>
+        {isDialogOpen &&
+          createPortal(
+            <div
+              className={
+                "flex flex-col absolute right-15 bottom-15 p-5 bg-[#E4E6E7] rounded-lg"
+              }
+            >
+              <h1>Add New To Do</h1>
+              <textarea className={"bg-white w-[120px]"} />
+              <button
+                className={"w-10 bg-black text-white"}
+                onClick={() => {
+                  dispatch(addNewTask("new task"));
+                }}
+              >
+                Add
+              </button>
+            </div>,
+            document.querySelector("header")!,
+          )}
       </div>
     </header>
   );

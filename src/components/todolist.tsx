@@ -1,39 +1,18 @@
-import { Task, TaskStatus } from "../app/App.tsx";
-import { ChangeEvent } from "react";
+import { useAppDispatch } from "../store/hooks.ts";
+import {
+  changeTaskStatus,
+  Task,
+  TaskStatus,
+} from "../store/slices/tasks-slice.ts";
 
 interface TodolistProps {
   filteredTasks: Task[];
-  tasks: Task[];
-  setTasks: (tasks: Task[]) => void;
 }
 
-export const Todolist = ({ filteredTasks, setTasks, tasks }: TodolistProps) => {
-  const onChangeTaskStatus = (
-    event: ChangeEvent<HTMLInputElement>,
-    id: string,
-  ) => {
-    if (event.target.checked) {
-      const newTasks = tasks.map((task) =>
-        task.id === id
-          ? {
-              ...task,
-              status: TaskStatus.DONE,
-            }
-          : task,
-      );
-      setTasks(newTasks);
-    } else {
-      const newTasks = tasks.map((task) =>
-        task.id === id
-          ? {
-              ...task,
-              status: TaskStatus.TODO,
-            }
-          : task,
-      );
-      setTasks(newTasks);
-    }
-    return !event.target.checked;
+export const Todolist = ({ filteredTasks }: TodolistProps) => {
+  const dispatch = useAppDispatch();
+  const onChangeTaskStatus = (id: string) => {
+    dispatch(changeTaskStatus(id));
   };
   return (
     <div className={"w-full flex flex-col gap-y-6"}>
@@ -47,7 +26,7 @@ export const Todolist = ({ filteredTasks, setTasks, tasks }: TodolistProps) => {
               <input
                 type="checkbox"
                 checked={task.status === TaskStatus.DONE}
-                onChange={(event) => onChangeTaskStatus(event, task.id)}
+                onChange={() => onChangeTaskStatus(task.id)}
               />
               <p>{task.title}</p>
             </li>
